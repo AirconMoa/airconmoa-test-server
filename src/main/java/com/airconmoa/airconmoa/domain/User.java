@@ -35,7 +35,6 @@ public class User {
     private String nickname;
     @Column(name = "user_photo")
     private String userPhoto;
-
     /*
     @OneToMany(mappedBy = "excutions")
     private List<Excution> excutions;
