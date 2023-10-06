@@ -11,63 +11,112 @@ env:
   DEPLOYMENT_GROUP_NAME: airconmoa_deploy_group
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        token: ${{secrets.TOKEN_GITHUB}}
-        submodules: recursive
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{secrets.TOKEN_GITHUB}}
+          submodules: recursive
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'corretto'
-        java-version: 17
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: 17
 
-    - name: Git Submodule Update
-      run: |
-        git submodule update --remote --recursive
+      - name: Git Submodule Update
+        run: |
+          git submodule update --remote --recursive
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
-      shell: bash
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 8.2.1
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 8.2.1
 
-    - name: Build with Gradle
-      run: ./gradlew clean build
-      shell: bash
+      - name: Build with Gradle
+        run: ./gradlew clean build
+        shell: bash
 
-#    - name: Make Zip File
-#      run: |
-#        mkdir content
-#        mv ./build/libs/*.jar ./content/
-#        zip buildFile.zip ./appspec.yml ./content/*.jar ./scripts/deploy.sh
-#      shell:
-#        bash
-#
-#    - name: Configure AWS Credentials
-#      uses: aws-actions/configure-aws-credentials@v2
-#      with:
-#        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-#        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-#        aws-region: ap-northeast-2
-#
-#    - name: Upload to S3
-#      run: |
-#        aws s3 cp \
-#          --region ap-northeast-2 \
-#          ./buildFile.zip s3://$BUCKET_NAME/$PROJECT_NAME/
-#
-#        - name: Code Deploy
-#          run: |
-#            aws deploy create-deployment \
-#              --application-name $CODE_DEPLOY_APP_NAME \
-#              --deployment-config-name CodeDeployDefault.OneAtATime \
-#              --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-#              --s3-location bucket=$BUCKET_NAME,key=$PROJECT_NAME/buildFile.zip,bundleType=zip
+      - name: Move *.jar File
+        run: |
+          mkdir content
+          mv ./build/libs/*.jar ./content/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: |
+            ./appspec.yml
+            ./content/*.jar
+            ./scripts/deploy.sh
+
+  zip:
+    name: Zip Deploy Files
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+
+      - name: Make Zip File
+        run: |
+          zip buildFile.zip ./appspec.yml ./content/*.jar ./scripts/deploy.sh
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: zip-artifact
+          path: buildFile.zip
+
+  upload:
+    name: Upload zip File To AWS S3
+    needs: zip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+            name: zip-artifact
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            ./buildFile.zip s3://$BUCKET_NAME/$PROJECT_NAME/
+
+  deploy:
+    name: Deploy with AWS CodeDeploy
+    needs: upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ap-northeast-2
+
+      - name: Deploy Code
+        run: |
+          aws deploy create-deployment \
+            --application-name $CODE_DEPLOY_APP_NAME \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+            --s3-location bucket=$BUCKET_NAME,key=$PROJECT_NAME/buildFile.zip,bundleType=zip
