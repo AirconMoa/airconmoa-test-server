@@ -41,6 +41,7 @@ jobs:
           gradle-version: 8.2.1
 
       - name: Build with Gradle
+        id: buildWithGradle
         run: ./gradlew clean build
         shell: bash
 
@@ -57,6 +58,14 @@ jobs:
             ./appspec.yml
             ./content/*.jar
             ./scripts/deploy.sh
+            
+      - name: Upload Report Artifact When Build Failed
+        if: ${{ failure() && steps.buildWithGradle.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-artifact
+          path: ./build/reports/
+        
 
   zip:
     name: Zip Deploy Files
