@@ -35,6 +35,12 @@ public class User {
     private String nickname;
     @Column(name = "user_photo")
     private String userPhoto;
+
+    @Column(name = "uid")
+    private String uid;//파이어베이스 인증
+
+    @Column(name = "device_token")
+    private String deviceToken;
     /*
     @OneToMany(mappedBy = "excutions")
     private List<Excution> excutions;
