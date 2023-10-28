@@ -1,6 +1,7 @@
 package com.airconmoa.airconmoa.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -33,28 +34,27 @@ public class User {
     private String nickname;
     @Column(name = "user_photo")
     private String userPhoto;
-
     @Column(name = "uid")
     private String uid;//파이어베이스 인증
-
     @Column(name = "device_token")
     private String deviceToken;
+    @Column(name = "role")
+    private UserRole role;
+
     /*
     @OneToMany(mappedBy = "excutions")
     private List<Excution> excutions;
     @OneToMany(mappedBy = "request_estimates")
     private List<Estimate> requestEstimates;
      */
-    private User(String authType, String email, String nickname, String userPhoto) {
+    @Builder
+    private User(String authId, String authType, String email, String nickname, String userPhoto) {
         this.authType = authType;
         this.email = email;
         this.nickname = nickname;
         this.userPhoto = userPhoto;
-        authId = null;
+        this.authId = authId;
+        this.role = UserRole.USER;
         phoneNumber = null;
-    }
-
-    public static User createNewUser(String authType, String email, String nickname, String userPhoto) {
-        return new User(authType, email, nickname, userPhoto);
     }
 }
