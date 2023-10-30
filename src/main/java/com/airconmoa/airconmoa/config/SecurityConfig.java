@@ -1,7 +1,7 @@
 package com.airconmoa.airconmoa.config;
 
 import com.airconmoa.airconmoa.config.jwt.JwtTokenFilter;
-import com.airconmoa.airconmoa.domain.UserRole;
+import com.airconmoa.airconmoa.domain.Role;
 import com.airconmoa.airconmoa.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +31,8 @@ public class SecurityConfig {
                 .authorizeRequests(authorizeRequests -> {
                     authorizeRequests
                             .requestMatchers(new AntPathRequestMatcher("/api/user/login")).permitAll()
-                            .requestMatchers(new AntPathRequestMatcher("/api/user/info")).hasAuthority(UserRole.USER.name())
-                            .requestMatchers(new AntPathRequestMatcher("/api/user/company")).hasAuthority(UserRole.COMPANY.name())
+                            .requestMatchers(new AntPathRequestMatcher("/api/user/info")).hasAuthority(Role.USER.name())
+                            .requestMatchers(new AntPathRequestMatcher("/api/user/company")).hasAuthority(Role.COMPANY.name())
                             .anyRequest().authenticated();
                 })
                 .build();

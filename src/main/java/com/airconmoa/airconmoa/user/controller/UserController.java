@@ -21,7 +21,7 @@ public class UserController {
         Optional<User> op_loginUser = userService.getUserByEmail(auth.getName());
         User loginUser = op_loginUser.get();
 
-        return String.format("emial : %s\nnickname : %s\nrole : %s",
+        return String.format("email : %s\nnickname : %s\nrole : %s",
                 loginUser.getEmail(), loginUser.getNickname(), loginUser.getRole().name());
     }
 
