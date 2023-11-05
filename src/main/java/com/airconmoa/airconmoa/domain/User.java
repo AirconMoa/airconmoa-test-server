@@ -1,6 +1,7 @@
 package com.airconmoa.airconmoa.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,7 +14,6 @@ import lombok.ToString;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     private Long userId;
     /*
         - created_at
@@ -21,40 +21,30 @@ public class User {
         - status
         는 baseEntity 생성
      */
-    @Column(name = "auth_id")
     private String authId;
-    @Column(name = "auth_type")
     private String authType;
-    @Column(name = "email")
     private String email;
-    @Column(name = "phone_number")
     private String phoneNumber; // 휴대폰 번호는 안받는게 나을지도?
-    @Column(name = "nickname")
     private String nickname;
-    @Column(name = "user_photo")
     private String userPhoto;
-
-    @Column(name = "uid")
     private String uid;//파이어베이스 인증
-
-    @Column(name = "device_token")
     private String deviceToken;
+    private Role role;
+
     /*
     @OneToMany(mappedBy = "excutions")
     private List<Excution> excutions;
     @OneToMany(mappedBy = "request_estimates")
     private List<Estimate> requestEstimates;
      */
-    private User(String authType, String email, String nickname, String userPhoto) {
+    @Builder
+    private User(String authId, String authType, String email, String nickname, String userPhoto) {
         this.authType = authType;
         this.email = email;
         this.nickname = nickname;
         this.userPhoto = userPhoto;
-        authId = null;
+        this.authId = authId;
+        this.role = Role.USER;
         phoneNumber = null;
-    }
-
-    public static User createNewUser(String authType, String email, String nickname, String userPhoto) {
-        return new User(authType, email, nickname, userPhoto);
     }
 }

@@ -22,13 +22,24 @@ repositories {
 }
 
 dependencies {
+	runtimeOnly 'com.h2database:h2'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	//spring-security
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'com.google.code.gson:gson:2.8.8'
+	//json
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
