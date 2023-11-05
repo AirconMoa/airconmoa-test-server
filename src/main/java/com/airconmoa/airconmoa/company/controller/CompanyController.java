@@ -33,6 +33,7 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.login(request));
 
     }
+    //업체 정보 출력
     @GetMapping("/info")
     public String companyInfo(Authentication auth) {
         Company company = companyService.getCompanyByEmail(auth.getName());
