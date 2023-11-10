@@ -24,10 +24,4 @@ public class UserController {
         return String.format("email : %s\nnickname : %s\nrole : %s",
                 loginUser.getEmail(), loginUser.getNickname(), loginUser.getRole().name());
     }
-
-    //권한 test용
-    @GetMapping("/company")
-    public String adminPage() {
-        return "업체용 페이지 접근 성공";
-    }
 }

@@ -1,5 +1,7 @@
 package com.airconmoa.airconmoa.config.jwt;
 
+import com.airconmoa.airconmoa.company.service.CompanyService;
+import com.airconmoa.airconmoa.domain.Company;
 import com.airconmoa.airconmoa.user.service.UserService;
 import com.airconmoa.airconmoa.domain.User;
 import jakarta.servlet.FilterChain;
@@ -23,6 +25,8 @@ import java.util.Optional;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+
+    private final CompanyService companyService;
     private final String secretKey;
 
     @Override
@@ -55,12 +59,22 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 추출한 loginId로 User 찾아오기
         Optional<User> loginUser = userService.getUserByEmail(email);
-
-        // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginUser.get().getEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.get().getRole().name())));
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+        // 추출한 loginId로 Company 찾아오기
+        Company loginCompany = companyService.getCompanyByEmail(email);
+        UsernamePasswordAuthenticationToken authenticationToken;
+        // 추출한 loginID가 companyEmail일 경우
+        if(loginUser.isEmpty()){
+            authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginCompany.getCompanyEmail(), null, List.of(new SimpleGrantedAuthority(loginCompany.getRole().name())));
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        }
+        // 추출한 loginID가 userEmail인 경우
+        else {
+            // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
+            authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginUser.get().getEmail(), null, List.of(new SimpleGrantedAuthority(loginUser.get().getRole().name())));
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        }
         // 권한 부여
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
