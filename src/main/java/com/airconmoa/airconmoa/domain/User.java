@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -37,6 +40,10 @@ public class User {
     @OneToMany(mappedBy = "request_estimates")
     private List<Estimate> requestEstimates;
      */
+
+    @OneToMany(mappedBy = "user")
+    private List<RequestEstimate> requestEstimates = new ArrayList<>();
+  
     @Builder
     private User(String authId, String authType, String email, String nickname, String userPhoto) {
         this.authType = authType;
