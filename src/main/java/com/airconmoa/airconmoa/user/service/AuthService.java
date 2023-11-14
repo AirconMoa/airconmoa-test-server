@@ -2,6 +2,8 @@ package com.airconmoa.airconmoa.user.service;
 
 
 import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
+import com.airconmoa.airconmoa.response.BaseException;
+import com.airconmoa.airconmoa.response.BaseResponseStatus;
 import com.airconmoa.airconmoa.user.dto.PostOauthLoginRes;
 import com.airconmoa.airconmoa.user.dto.PostUidDeviceTokenReq;
 import com.airconmoa.airconmoa.user.dto.SignupReq;
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.airconmoa.airconmoa.response.BaseResponseStatus.LOGIN_INFO_CANNOT_BE_NULL;
+import static com.airconmoa.airconmoa.response.BaseResponseStatus.NONE_EXIST_USER;
 
 
 @Service
@@ -43,20 +48,25 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public PostOauthLoginRes oauthLogin(String authType, String accessToken) {
-        User user = null;
-        String jwtToken;
-        if(authType.equals("kakao")) {
-            user = findKakao(accessToken);
-            log.debug("user", user.toString());
+    public PostOauthLoginRes oauthLogin(String authType, String accessToken) throws BaseException {
+        if (authType.isEmpty() || accessToken.isEmpty()) {
+            throw new BaseException(LOGIN_INFO_CANNOT_BE_NULL);
         }
-        else if(authType.equals("naver")) {
-            // user = findNaver(accessToken);
-            // jwtToken = login(authType, accessToken);
+        else {
+            User user = null;
+            String jwtToken;
+            if(authType.equals("kakao")) {
+                user = findKakao(accessToken);
+                log.debug("user", user.toString());
+            }
+            else if(authType.equals("naver")) {
+                // user = findNaver(accessToken);
+                // jwtToken = login(authType, accessToken);
+            }
+            long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
+            jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
+            return new PostOauthLoginRes(user.getUserId(), user.getEmail(), jwtToken);
         }
-        long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
-        jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
-        return new PostOauthLoginRes(user.getUserId(), user.getEmail(), jwtToken);
     }
 
     public String login(String authType,String accessToken){
@@ -127,14 +137,15 @@ public class AuthService {
         return null;
     }
 
-    public String saveUidAndToken(String userEmail, PostUidDeviceTokenReq postUidDeviceTokenReq) {
+    public String saveUidAndToken(String userEmail, PostUidDeviceTokenReq postUidDeviceTokenReq) throws BaseException {
         User user = userRepository.findByEmail(userEmail).orElse(null);
-
-        if(user != null) {
-            user.updateUid(postUidDeviceTokenReq.getUid());
-            user.updateDeviceToken(postUidDeviceTokenReq.getDeviceToken());
-            userRepository.save(user);
+        if(user == null) {
+            throw new BaseException(NONE_EXIST_USER);
         }
+
+        user.updateUid(postUidDeviceTokenReq.getUid());
+        user.updateDeviceToken(postUidDeviceTokenReq.getDeviceToken());
+        userRepository.save(user);
 
         return "UID와 디바이스 토큰이 저장되었습니다.";
     }

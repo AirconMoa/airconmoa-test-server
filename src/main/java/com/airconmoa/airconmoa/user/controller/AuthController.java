@@ -1,6 +1,8 @@
 package com.airconmoa.airconmoa.user.controller;
 
 import com.airconmoa.airconmoa.domain.User;
+import com.airconmoa.airconmoa.response.BaseException;
+import com.airconmoa.airconmoa.response.BaseResponse;
 import com.airconmoa.airconmoa.user.dto.PostOauthLoginRes;
 import com.airconmoa.airconmoa.user.dto.PostUidDeviceTokenReq;
 import com.airconmoa.airconmoa.user.dto.UserSignupReq;
@@ -32,22 +34,32 @@ public class AuthController {
 //        return ResponseEntity.ok(new UserSignupRes(user.getNickname(), user.getUserId()));
 //    }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserSignupReq request) {
-        //프런트에게 받을 accessToken을 테스트용으로 발급한 코드
-//        String token = authService.getKakaoAccessToken
-//                ("E0217FS-3faKpiheVTRELn9ERbHFx3X-ogxvVJfYbFGZLQE9nmHN6mrAdc4KKiUQAAABi3XTKcqm1x-HnlkNwQ");
-        return ResponseEntity.ok(authService.login(request.getAuthType(), request.getAccessToken()));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<String> login(@RequestBody UserSignupReq request) {
+//        //프런트에게 받을 accessToken을 테스트용으로 발급한 코드
+////        String token = authService.getKakaoAccessToken
+////                ("E0217FS-3faKpiheVTRELn9ERbHFx3X-ogxvVJfYbFGZLQE9nmHN6mrAdc4KKiUQAAABi3XTKcqm1x-HnlkNwQ");
+//        return ResponseEntity.ok(authService.login(request.getAuthType(), request.getAccessToken()));
+//    }
 
+    /** 카카오 소셜로그인 **/
     @PostMapping("/signup")
-    public ResponseEntity<PostOauthLoginRes> oauthLogin(@RequestBody UserSignupReq request) {
-        return ResponseEntity.ok(authService.oauthLogin(request.getAuthType(), request.getAccessToken()));
+    public BaseResponse<PostOauthLoginRes> oauthLogin(@RequestBody UserSignupReq request) {
+        try {
+            return new BaseResponse<>(authService.oauthLogin(request.getAuthType(), request.getAccessToken()));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 
+    /** UID와 디바이스 토큰 저장 **/
     @PostMapping("/oauth/device-token")
-    public ResponseEntity<String> saveUidAndToken(Authentication auth, @RequestBody PostUidDeviceTokenReq postUidDeviceTokenReq) {
-        String userEmail = auth.getName();
-        return ResponseEntity.ok(authService.saveUidAndToken(userEmail, postUidDeviceTokenReq));
+    public BaseResponse<String> saveUidAndToken(Authentication auth, @RequestBody PostUidDeviceTokenReq postUidDeviceTokenReq) {
+        try {
+            String userEmail = auth.getName();
+            return new BaseResponse<>(authService.saveUidAndToken(userEmail, postUidDeviceTokenReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
 }
