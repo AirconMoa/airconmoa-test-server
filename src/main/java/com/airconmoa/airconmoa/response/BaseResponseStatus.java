@@ -16,6 +16,9 @@ public enum BaseResponseStatus {
     // Common
     LOGIN_INFO_CANNOT_BE_NULL(false, 2000, "로그인 타입과 액세스 토큰이 존재하지 않습니다."),
     NONE_EXIST_USER(false, 2001, "사용자에 대한 정보가 잘못되었습니다."),
+    ALREADY_EXIST_EMAIL(false, 2002, "이미 가입된 계정입니다."),
+    NONE_EXIST_EMAIL(false, 2003, "존재하지 않는 이메일입니다."),
+    NONE_EXIST_COMPANY(false, 2001, "업체에 대한 정보가 잘못되었습니다."),
 
     // [POST] /boards
     POST_BOARDS_EMPTY_TITLE(false, 2025, "제목은 두 글자 이상으로 작성해주세요."),

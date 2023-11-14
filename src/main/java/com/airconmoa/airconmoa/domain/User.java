@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.domain;
 
+import com.airconmoa.airconmoa.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,16 +15,10 @@ import java.util.List;
 @Getter
 @ToString(exclude = "userId")
 @NoArgsConstructor
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    /*
-        - created_at
-        - updated_at
-        - status
-        는 baseEntity 생성
-     */
     private String authId;
     private String authType;
     private String email;
@@ -32,6 +27,8 @@ public class User {
     private String userPhoto;
     private String uid;//파이어베이스 인증
     private String deviceToken;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     /*

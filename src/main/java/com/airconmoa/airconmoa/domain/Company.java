@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.domain;
 
+import com.airconmoa.airconmoa.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString(exclude = "companyId")
 @NoArgsConstructor
-public class Company {
+public class Company extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long companyId;
