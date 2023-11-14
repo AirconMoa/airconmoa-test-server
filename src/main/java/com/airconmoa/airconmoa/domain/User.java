@@ -19,16 +19,33 @@ public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(nullable = false)
     private String authId;
+
+    @Column(nullable = false)
     private String authType;
+
+    @Column(nullable = false)
     private String email;
-    private String phoneNumber; // 휴대폰 번호는 안받는게 나을지도?
+
+    @Column(nullable = true)
+    private String phoneNumber;
+
+    @Column(nullable = false)
     private String nickname;
+
+    @Column(nullable = true)
     private String userPhoto;
-    private String uid;//파이어베이스 인증
+
+    @Column(nullable = true)
+    private String uid;
+
+    @Column(nullable = true)
     private String deviceToken;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
     /*

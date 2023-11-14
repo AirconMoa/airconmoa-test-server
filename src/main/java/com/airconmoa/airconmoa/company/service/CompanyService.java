@@ -85,6 +85,10 @@ public class CompanyService {
         for (RequestEstimate requestEstimate : requestEstimateList) {
             GetRequestEstimateRes getRequestEstimateRes = new GetRequestEstimateRes();
 
+            // requestEstimateId를 추출
+            Long requestEstimateId = requestEstimate.getRequestEstimateId();
+            getRequestEstimateRes.setRequestEstimateId(requestEstimateId);
+
             // profileUrl을 추출
             String profileUrl = requestEstimate.getUser().getUserPhoto();
             if (profileUrl != null) {

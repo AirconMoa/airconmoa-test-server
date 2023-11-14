@@ -22,12 +22,27 @@ public class Company extends BaseTimeEntity {
         - status
         는 baseEntity 생성
      */
+    @Column(nullable = false)
     private String companyName;
+
+    @Column(nullable = false)
     private String companyNumber;
+
+    @Column(nullable = false)
     private String companyEmail;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = true)
     private String companyAddress;
+
+    @Column(nullable = false)
     private Role role;
+
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ResponseEstimate responseEstimate;
+
     //private List<CompnayPhoto> compnayPhotos = new ArrayList<>();
     //private List<Region> activeAreas = new ArrayList<>();
     //private List<Execution> executions = new ArrayList<>();

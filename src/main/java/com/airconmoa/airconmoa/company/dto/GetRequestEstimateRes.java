@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class GetRequestEstimateRes {
+    Long requestEstimateId;
     String porfileUrl;
     String userNickname;
     InstallInfo installInfo;

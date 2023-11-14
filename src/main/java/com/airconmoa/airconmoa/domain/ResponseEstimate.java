@@ -3,14 +3,13 @@ package com.airconmoa.airconmoa.domain;
 import com.airconmoa.airconmoa.constant.Brand;
 import com.airconmoa.airconmoa.constant.BuildingType;
 import com.airconmoa.airconmoa.constant.InstallInfo;
+import com.airconmoa.airconmoa.requestEstimate.dto.PostRequestEstimateReq;
+import com.airconmoa.airconmoa.responseEstimate.dto.PostResponseEstimateReq;
 import com.airconmoa.airconmoa.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
-import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = "response_estimate")
@@ -30,7 +29,19 @@ public class ResponseEstimate extends BaseTimeEntity {
     @Column(nullable = true)
     private String additionalInfo; // 추가 전달 사항
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_estimate_id")
+    private RequestEstimate requestEstimate;
+
+    public ResponseEstimate(Company company, RequestEstimate requestEstimate, PostResponseEstimateReq postResponseEstimateReq) {
+        this.price = postResponseEstimateReq.getPrice();
+        this.contents = postResponseEstimateReq.getContents();
+        this.additionalInfo = postResponseEstimateReq.getAdditionalInfo();
+        this.company = company;
+        this.requestEstimate = requestEstimate;
+    }
 }

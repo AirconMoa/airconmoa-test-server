@@ -40,6 +40,9 @@ public class RequestEstimate extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToOne(mappedBy = "requestEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ResponseEstimate responseEstimate;
+
     public RequestEstimate(User user, PostRequestEstimateReq postRequestEstimateReq) {
         this.installInfo = postRequestEstimateReq.getInstallInfo();
         this.installAddress = postRequestEstimateReq.getInstallAddress();

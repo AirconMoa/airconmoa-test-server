@@ -19,6 +19,7 @@ public enum BaseResponseStatus {
     ALREADY_EXIST_EMAIL(false, 2002, "이미 가입된 계정입니다."),
     NONE_EXIST_EMAIL(false, 2003, "존재하지 않는 이메일입니다."),
     NONE_EXIST_COMPANY(false, 2001, "업체에 대한 정보가 잘못되었습니다."),
+    NONE_EXIST_REQUEST_ESTIMATE(false, 2001, "견적 요청서에 대한 정보가 잘못되었습니다."),
 
     // [POST] /boards
     POST_BOARDS_EMPTY_TITLE(false, 2025, "제목은 두 글자 이상으로 작성해주세요."),
