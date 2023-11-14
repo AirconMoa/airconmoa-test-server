@@ -2,12 +2,19 @@ package com.airconmoa.airconmoa.user.service;
 
 
 import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
+import com.airconmoa.airconmoa.user.dto.PostOauthLoginRes;
+import com.airconmoa.airconmoa.user.dto.PostUidDeviceTokenReq;
+import com.airconmoa.airconmoa.user.dto.SignupReq;
+import com.airconmoa.airconmoa.user.dto.UserSignupReq;
 import com.airconmoa.airconmoa.user.repository.UserRepository;
 import com.airconmoa.airconmoa.domain.User;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +25,7 @@ import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -34,6 +42,23 @@ public class AuthService {
         }
         return userRepository.save(user);
     }
+
+    public PostOauthLoginRes oauthLogin(String authType, String accessToken) {
+        User user = null;
+        String jwtToken;
+        if(authType.equals("kakao")) {
+            user = findKakao(accessToken);
+            log.debug("user", user.toString());
+        }
+        else if(authType.equals("naver")) {
+            // user = findNaver(accessToken);
+            // jwtToken = login(authType, accessToken);
+        }
+        long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
+        jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
+        return new PostOauthLoginRes(user.getUserId(), user.getEmail(), jwtToken);
+    }
+
     public String login(String authType,String accessToken){
         User find_user = null;
         if(authType.equals("kakao")) {
@@ -82,14 +107,36 @@ public class AuthService {
             System.out.println(nickname);
             String email = object.getAsJsonObject("kakao_account").get("email").getAsString();
             System.out.println(email);
-            String photo = object.getAsJsonObject("properties").get("profile_image").getAsString();
-            System.out.println(photo);
+            if(userRepository.findByEmailCount(email) >= 1) { // 기존 유저
+                User user = userRepository.findByEmail(email).orElse(null);
+                return user;
+            }
+            String photo = null;
+            if(object.getAsJsonObject("properties").get("profile_image") != null) {
+                photo = object.getAsJsonObject("properties").get("profile_image").getAsString();
+                System.out.println(photo);
+            }
+            // 신규 유저
             User user = User.builder().authId(id).authType("kakao").nickname(nickname).email(email).userPhoto(photo).build();
+            userRepository.save(user);
+            userRepository.flush();
             return user;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String saveUidAndToken(String userEmail, PostUidDeviceTokenReq postUidDeviceTokenReq) {
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+
+        if(user != null) {
+            user.updateUid(postUidDeviceTokenReq.getUid());
+            user.updateDeviceToken(postUidDeviceTokenReq.getDeviceToken());
+            userRepository.save(user);
+        }
+
+        return "UID와 디바이스 토큰이 저장되었습니다.";
     }
 
     public String getKakaoAccessToken(String code) {

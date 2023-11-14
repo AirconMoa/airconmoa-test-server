@@ -54,4 +54,7 @@ public class User {
         this.role = Role.USER;
         phoneNumber = null;
     }
+
+    public void updateUid(String uid) { this.uid = uid; }
+    public void updateDeviceToken(String deviceToken) { this.deviceToken = deviceToken; }
 }
