@@ -6,15 +6,17 @@ import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
 import com.airconmoa.airconmoa.constant.InstallInfo;
 import com.airconmoa.airconmoa.domain.Company;
 import com.airconmoa.airconmoa.domain.RequestEstimate;
-import com.airconmoa.airconmoa.domain.User;
 import com.airconmoa.airconmoa.requestEstimate.repository.RequestEstimateRepository;
 import com.airconmoa.airconmoa.response.BaseException;
 import com.airconmoa.airconmoa.response.BaseResponseStatus;
+import com.airconmoa.airconmoa.user.dto.GetS3Res;
+import com.airconmoa.airconmoa.util.S3Service;
 import com.airconmoa.airconmoa.util.UtilService;
-import com.fasterxml.jackson.databind.ser.Serializers;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final RequestEstimateRepository requestEstimateRepository;
     private final UtilService utilService;
+    private final S3Service s3Service;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -40,6 +43,8 @@ public class CompanyService {
                 .companyEmail(request.getEmail())
                 .companyName(request.getCompanyName())
                 .password(request.getPassword())
+                .companyImgUrl(null)
+                .companyImgFileName(null)
                 .build();
 
         if(company == null) {
@@ -130,5 +135,40 @@ public class CompanyService {
         long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
         String jwtToken = JwtTokenUtil.createToken(company.getCompanyEmail(), secretKey, expireTimeMs);
         return jwtToken;
+    }
+
+    @Transactional
+    public String modifyCompanyImage(String email, MultipartFile multipartFile) throws BaseException {
+        try {
+            Company company = utilService.findByCompanyEmailWithValidation(email);
+            String imgUrl = company.getCompanyImgUrl();
+            if(imgUrl == null) { // 프로필이 미등록된 업체가 변경을 요청하는 경우
+                GetS3Res getS3Res;
+                if(multipartFile != null) {
+                    getS3Res = s3Service.uploadSingleFile(multipartFile);
+                    company.setCompanyImg(getS3Res);
+                    companyRepository.save(company);
+                }
+            }
+            else { // 프로필을 이미 등록한 업체가 변경을 요청하는 경우
+                // 1. 버킷에서 삭제
+                deleteImage(company.getCompanyImgFileName());
+                // 2. 업체의 이미지를 null로 초기화
+                company.setCompanyImg(null);
+                if(multipartFile != null) {
+                    GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFile);
+                    company.setCompanyImg(getS3Res);
+                }
+                companyRepository.save(company);
+            }
+            return "업체 이미지 설정이 완료되었습니다.";
+        } catch (BaseException exception) {
+            throw new BaseException(exception.getStatus());
+        }
+    }
+
+    @Transactional
+    public void deleteImage(String fileName) {
+        s3Service.deleteFile(fileName);
     }
 }

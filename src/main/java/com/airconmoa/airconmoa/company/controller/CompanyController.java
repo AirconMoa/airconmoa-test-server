@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class CompanyController {
         }
     }
 
-    // 업체 정보 출력
+    // 업체 마이페이지 정보 출력
     @GetMapping("/company-info")
     public BaseResponse<CompanyInfoRes> getCompanyInfo(Authentication auth) {
         try {
@@ -54,6 +55,18 @@ public class CompanyController {
         try {
             String email = auth.getName();
             return new BaseResponse<>(companyService.getRequestEstimateList(email));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /** 시스템 에어컨 업체의 이미지를 설정하는 API **/
+    @PatchMapping("/image")
+    public BaseResponse<String> modifyCompanyImage(Authentication auth,
+                                                   @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+        try {
+            String email = auth.getName();
+            return new BaseResponse<>(companyService.modifyCompanyImage(email, multipartFile));
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

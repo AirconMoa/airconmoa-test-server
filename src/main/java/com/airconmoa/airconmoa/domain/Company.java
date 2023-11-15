@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.domain;
 
+import com.airconmoa.airconmoa.user.dto.GetS3Res;
 import com.airconmoa.airconmoa.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -37,6 +38,12 @@ public class Company extends BaseTimeEntity {
     @Column(nullable = true)
     private String companyAddress;
 
+    @Column(nullable = true)
+    private String companyImgUrl;
+
+    @Column(nullable = true)
+    private String companyImgFileName;
+
     @Column(nullable = false)
     private Role role;
 
@@ -48,12 +55,20 @@ public class Company extends BaseTimeEntity {
     //private List<Execution> executions = new ArrayList<>();
     //private List<Estimate> estimates = new ArrayList<>();
     @Builder
-    private Company(String companyName, String companyNumber, String companyEmail, String password, String companyAddress){
+    private Company(String companyName, String companyNumber, String companyEmail,
+                    String password, String companyAddress, String companyImgUrl, String companyImgFileName) {
         this.companyName = companyName;
         this.companyNumber = companyNumber;
         this.companyEmail = companyEmail;
         this.password = password;
         this.companyAddress = companyAddress;
+        this.companyImgUrl = companyImgUrl;
+        this.companyImgFileName = companyImgFileName;
         this.role = Role.COMPANY;
+    }
+
+    public void setCompanyImg(GetS3Res getS3Res) {
+        this.companyImgUrl = getS3Res.getImgUrl();
+        this.companyImgFileName = getS3Res.getFileName();
     }
 }

@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.user.controller;
 
+import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
 import com.airconmoa.airconmoa.domain.User;
 import com.airconmoa.airconmoa.response.BaseException;
 import com.airconmoa.airconmoa.response.BaseResponse;
@@ -22,7 +23,6 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserService userService;
-
     private final AuthService authService;
 
 //    @PostMapping("/signup")

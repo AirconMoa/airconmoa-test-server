@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.user.controller;
 
+import com.airconmoa.airconmoa.company.dto.CompanyInfoRes;
 import com.airconmoa.airconmoa.company.dto.GetRequestEstimateRes;
 import com.airconmoa.airconmoa.domain.User;
 import com.airconmoa.airconmoa.response.BaseException;
@@ -27,6 +28,16 @@ public class UserController {
         try {
             String email = auth.getName();
             return new BaseResponse<>(userService.getResponseEstimateResList(email));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /** 시스템 에어컨 업체 조회 API **/
+    @GetMapping("/company-info")
+    public BaseResponse<List<CompanyInfoRes>> getCompanyInfo() {
+        try {
+            return new BaseResponse<>(userService.getCompanyInfo());
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

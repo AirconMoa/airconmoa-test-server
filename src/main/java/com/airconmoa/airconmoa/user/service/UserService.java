@@ -1,9 +1,14 @@
 package com.airconmoa.airconmoa.user.service;
 
+import com.airconmoa.airconmoa.company.dto.CompanyInfoRes;
 import com.airconmoa.airconmoa.company.dto.GetRequestEstimateRes;
+import com.airconmoa.airconmoa.company.repository.CompanyRepository;
 import com.airconmoa.airconmoa.constant.InstallInfo;
+import com.airconmoa.airconmoa.domain.Company;
 import com.airconmoa.airconmoa.domain.RequestEstimate;
 import com.airconmoa.airconmoa.domain.ResponseEstimate;
+import com.airconmoa.airconmoa.response.BaseException;
+import com.airconmoa.airconmoa.response.BaseResponseStatus;
 import com.airconmoa.airconmoa.responseEstimate.repository.ResponseEstimateRepository;
 import com.airconmoa.airconmoa.user.dto.GetResponseEstimateRes;
 import com.airconmoa.airconmoa.user.repository.UserRepository;
@@ -23,6 +28,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final ResponseEstimateRepository responseEstimateRepository;
     private final UtilService utilService;
 
@@ -58,5 +64,17 @@ public class UserService {
         }
 
         return getResponseEstimateResList;
+    }
+
+    public List<CompanyInfoRes> getCompanyInfo() throws BaseException {
+        List<Company> companyList = companyRepository.findAll();
+        List<CompanyInfoRes> companyInfoResList = new ArrayList<>();
+
+        for (Company company : companyList) {
+            CompanyInfoRes companyInfoRes = new CompanyInfoRes(company);
+            companyInfoResList.add(companyInfoRes);
+        }
+
+        return companyInfoResList;
     }
 }
