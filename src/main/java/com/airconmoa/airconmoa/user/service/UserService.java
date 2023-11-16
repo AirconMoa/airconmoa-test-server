@@ -16,6 +16,7 @@ import com.airconmoa.airconmoa.domain.User;
 import com.airconmoa.airconmoa.util.UtilService;
 import com.amazonaws.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ public class UserService {
     private final CompanyRepository companyRepository;
     private final ResponseEstimateRepository responseEstimateRepository;
     private final UtilService utilService;
+    private final RedisTemplate redisTemplate;
 
     public Optional<User> getUserByEmail(String email){
         return userRepository.findByEmail(email);

@@ -39,6 +39,14 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// redis 의존성
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// AWS SQS 의존성
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-messaging', version: '2.2.3.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws-autoconfigure', version: '2.2.3.RELEASE'
+	implementation 'org.springframework.boot:spring-boot-starter'
 }
 
 

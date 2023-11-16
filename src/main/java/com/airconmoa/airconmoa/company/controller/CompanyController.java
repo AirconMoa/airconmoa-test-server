@@ -38,6 +38,17 @@ public class CompanyController {
         }
     }
 
+    // 로그아웃
+    @PostMapping("/log-out") // Redis가 켜져있어야 동작한다.
+    public BaseResponse<String> logoutCompany(Authentication auth) {
+        try {
+            String email = auth.getName();
+            return new BaseResponse<>(companyService.logout(email));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     // 업체 마이페이지 정보 출력
     @GetMapping("/company-info")
     public BaseResponse<CompanyInfoRes> getCompanyInfo(Authentication auth) {

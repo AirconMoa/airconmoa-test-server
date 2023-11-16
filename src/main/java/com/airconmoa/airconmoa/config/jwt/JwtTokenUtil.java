@@ -3,9 +3,14 @@ package com.airconmoa.airconmoa.config.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Date;
 
+@Component
 public class JwtTokenUtil {
 
     // JWT Token 발급
@@ -38,5 +43,23 @@ public class JwtTokenUtil {
     // SecretKey를 사용해 Token Parsing
     private static Claims extractClaims(String token, String secretKey) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
+
+    public String getJwt(){
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        return request.getHeader("Authorization");
+    }
+
+    public Long getExpiration(String accessToken, String key) {
+        // accessToken 남은 유효시간
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getExpiration();
+        // 현재 시간
+        Long now = System.currentTimeMillis();
+        return (expiration.getTime() - now);
     }
 }

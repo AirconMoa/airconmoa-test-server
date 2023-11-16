@@ -10,19 +10,25 @@ import com.airconmoa.airconmoa.requestEstimate.repository.RequestEstimateReposit
 import com.airconmoa.airconmoa.response.BaseException;
 import com.airconmoa.airconmoa.response.BaseResponseStatus;
 import com.airconmoa.airconmoa.user.dto.GetS3Res;
+import com.airconmoa.airconmoa.util.AES128;
 import com.airconmoa.airconmoa.util.S3Service;
+import com.airconmoa.airconmoa.util.Secret;
 import com.airconmoa.airconmoa.util.UtilService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CompanyService {
 
@@ -30,6 +36,8 @@ public class CompanyService {
     private final RequestEstimateRepository requestEstimateRepository;
     private final UtilService utilService;
     private final S3Service s3Service;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final RedisTemplate redisTemplate;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -37,12 +45,21 @@ public class CompanyService {
         if(isExist(request.getEmail())){
             throw new BaseException(BaseResponseStatus.ALREADY_EXIST_EMAIL);
         }
+
+        String pwd = "";
+        try{
+            pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(request.getPassword()); // 암호화코드
+        }
+        catch (Exception ignored) { // 암호화가 실패하였을 경우 에러 발생
+            throw new BaseException(BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR);
+        }
+
         Company company = Company.builder()
                 .companyNumber(request.getCompanyNumber())
                 .companyAddress(request.getAddress())
                 .companyEmail(request.getEmail())
                 .companyName(request.getCompanyName())
-                .password(request.getPassword())
+                .password(pwd)
                 .companyImgUrl(null)
                 .companyImgFileName(null)
                 .build();
@@ -63,14 +80,32 @@ public class CompanyService {
 
     private boolean isExist(String email) {
         Company company = companyRepository.findCompanyByCompanyEmail(email);
+
         if(company == null){
             return false;
-        }return true;
+        }
+
+        return true;
     }
 
     public Company getCompanyByEmail(String email) {
         Company company = companyRepository.findCompanyByCompanyEmail(email);
         return company;
+    }
+
+    @Transactional
+    public String logout(String email) throws BaseException{
+        try {
+            utilService.findByCompanyEmailWithValidation(email);
+            String accessToken = jwtTokenUtil.getJwt();
+            //엑세스 토큰 남은 유효시간
+            Long expiration = jwtTokenUtil.getExpiration(accessToken, secretKey);
+            //Redis Cache에 저장
+            redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+            return "로그아웃 되었습니다.";
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.FAILED_TO_LOGOUT);
+        }
     }
 
     public CompanyInfoRes getCompanyInfo(String email) throws BaseException {
@@ -127,7 +162,15 @@ public class CompanyService {
             throw new BaseException(BaseResponseStatus.NONE_EXIST_EMAIL);
         }
 
-        if(!company.getPassword().equals(request.getPassword())){ // 비밀번호 잘못 입력함
+        String password;
+        try {
+            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(request.getPassword());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new BaseException(BaseResponseStatus.PASSWORD_DECRYPTION_ERROR);
+        }
+
+        if (!company.getPassword().equals(password)) { // 비밀번호 잘못 입력함
             throw new BaseException(BaseResponseStatus.PASSWORD_MISSMATCH);
         }
 

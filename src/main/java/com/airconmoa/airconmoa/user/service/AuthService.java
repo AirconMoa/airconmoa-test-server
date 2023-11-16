@@ -2,6 +2,7 @@ package com.airconmoa.airconmoa.user.service;
 
 
 import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
+import com.airconmoa.airconmoa.domain.Company;
 import com.airconmoa.airconmoa.response.BaseException;
 import com.airconmoa.airconmoa.response.BaseResponseStatus;
 import com.airconmoa.airconmoa.user.dto.PostOauthLoginRes;
@@ -10,19 +11,25 @@ import com.airconmoa.airconmoa.user.dto.SignupReq;
 import com.airconmoa.airconmoa.user.dto.UserSignupReq;
 import com.airconmoa.airconmoa.user.repository.UserRepository;
 import com.airconmoa.airconmoa.domain.User;
+import com.airconmoa.airconmoa.util.UtilService;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.jsonwebtoken.Jwt;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.juli.logging.Log;
+import org.aspectj.weaver.Utils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static com.airconmoa.airconmoa.response.BaseResponseStatus.LOGIN_INFO_CANNOT_BE_NULL;
 import static com.airconmoa.airconmoa.response.BaseResponseStatus.NONE_EXIST_USER;
@@ -34,6 +41,9 @@ import static com.airconmoa.airconmoa.response.BaseResponseStatus.NONE_EXIST_USE
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UtilService utilService;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final RedisTemplate redisTemplate;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -86,6 +96,23 @@ public class AuthService {
         String jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
         return jwtToken;
     }
+
+    @Transactional
+    public String logout(String email) throws BaseException{
+        try {
+            utilService.findByUserEmailWithValidation(email);
+            String accessToken = jwtTokenUtil.getJwt();
+            //엑세스 토큰 남은 유효시간
+            Long expiration = jwtTokenUtil.getExpiration(accessToken, secretKey);
+            //Redis Cache에 저장
+            redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+            return "로그아웃 되었습니다.";
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.FAILED_TO_LOGOUT);
+        }
+
+    }
+
     public User findKakao(String accessToken) {
         try {
             String reqURL = "https://kapi.kakao.com/v2/user/me";

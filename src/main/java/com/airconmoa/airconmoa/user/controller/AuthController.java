@@ -22,25 +22,7 @@ import java.util.Optional;
 @RequestMapping("/api/user")
 public class AuthController {
 
-    private final UserService userService;
     private final AuthService authService;
-
-//    @PostMapping("/signup")
-//    public ResponseEntity<UserSignupRes> signUp(@RequestBody UserSignupReq request) {
-//        //프런트에게 받을 accessToken을 테스트용으로 발급한 코드
-////        String token = authService.getKakaoAccessToken
-////                ("CbM0_fMMugxT6r5EJvtRyPbQx1P3NEjTKa9riaSxD2o5D1YnQJq4-DV9UVQKKiVOAAABi3XSdRKi-KZYUq23DA");
-//        User user = authService.saveUser(request.getAuthType(), request.getAccessToken());
-//        return ResponseEntity.ok(new UserSignupRes(user.getNickname(), user.getUserId()));
-//    }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<String> login(@RequestBody UserSignupReq request) {
-//        //프런트에게 받을 accessToken을 테스트용으로 발급한 코드
-////        String token = authService.getKakaoAccessToken
-////                ("E0217FS-3faKpiheVTRELn9ERbHFx3X-ogxvVJfYbFGZLQE9nmHN6mrAdc4KKiUQAAABi3XTKcqm1x-HnlkNwQ");
-//        return ResponseEntity.ok(authService.login(request.getAuthType(), request.getAccessToken()));
-//    }
 
     /** 카카오 소셜로그인 **/
     @PostMapping("/signup")
@@ -60,6 +42,17 @@ public class AuthController {
             return new BaseResponse<>(authService.saveUidAndToken(userEmail, postUidDeviceTokenReq));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    // 로그아웃
+    @PostMapping("/log-out") // Redis가 켜져있어야 동작한다.
+    public BaseResponse<String> logoutUser(Authentication auth) {
+        try {
+            String email = auth.getName();
+            return new BaseResponse<>(authService.logout(email));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
