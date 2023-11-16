@@ -26,4 +26,11 @@ public class RequestEstimateService {
         requestEstimateRepository.save(requestEstimate);
         return "견적 요청서 작성이 완료되었어요!";
     }
+
+    public PostRequestEstimateReq getRequestEstimate(String companyEmail, Long requestEstimateId) {
+        utilService.findByCompanyEmailWithValidation(companyEmail);
+        RequestEstimate requestEstimate = utilService.findByRequestEstimateIdWithValidation(requestEstimateId);
+        return new PostRequestEstimateReq(requestEstimate);
+    }
+
 }

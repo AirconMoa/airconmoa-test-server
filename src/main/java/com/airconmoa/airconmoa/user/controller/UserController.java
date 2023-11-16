@@ -10,6 +10,7 @@ import com.airconmoa.airconmoa.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,5 +50,17 @@ public class UserController {
 
         return String.format("email : %s\nnickname : %s\nrole : %s",
                 loginUser.getEmail(), loginUser.getNickname(), loginUser.getRole().name());
+    }
+
+    /** 유저의 이미지를 설정하는 API **/
+    @PatchMapping("/image")
+    public BaseResponse<String> modifyUserImage(Authentication auth,
+                                                   @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+        try {
+            String email = auth.getName();
+            return new BaseResponse<>(userService.modifyUserImage(email, multipartFile));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 }

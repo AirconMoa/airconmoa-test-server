@@ -6,10 +6,7 @@ import com.airconmoa.airconmoa.response.BaseException;
 import com.airconmoa.airconmoa.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/request_estimate")
@@ -23,6 +20,17 @@ public class RequestEstimateController {
         try {
             String userEmail = auth.getName();
             return new BaseResponse<>(requestEstimateService.saveRequestEstimate(userEmail, postRequestEstimateReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    // 견적 요청서 세부 조회 API
+    @GetMapping("")
+    public BaseResponse<PostRequestEstimateReq> getRequestEstimate(Authentication auth, @RequestParam Long requestEstimateId) {
+        try {
+            String companyEmail = auth.getName();
+            return new BaseResponse<>(requestEstimateService.getRequestEstimate(companyEmail, requestEstimateId));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

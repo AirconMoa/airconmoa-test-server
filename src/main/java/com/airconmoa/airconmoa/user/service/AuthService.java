@@ -154,7 +154,7 @@ public class AuthService {
                 System.out.println(photo);
             }
             // 신규 유저
-            User user = User.builder().authId(id).authType("kakao").nickname(nickname).email(email).userPhoto(photo).build();
+            User user = User.builder().authId(id).authType("kakao").nickname(nickname).email(email).profileUrl(photo).build();
             userRepository.save(user);
             userRepository.flush();
             return user;

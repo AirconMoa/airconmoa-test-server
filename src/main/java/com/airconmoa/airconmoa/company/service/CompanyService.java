@@ -130,7 +130,7 @@ public class CompanyService {
             getRequestEstimateRes.setRequestEstimateId(requestEstimateId);
 
             // profileUrl을 추출
-            String profileUrl = requestEstimate.getUser().getUserPhoto();
+            String profileUrl = requestEstimate.getUser().getProfileUrl();
             if (profileUrl != null) {
                 getRequestEstimateRes.setPorfileUrl(profileUrl);
             } else {

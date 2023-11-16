@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.domain;
 
+import com.airconmoa.airconmoa.user.dto.GetS3Res;
 import com.airconmoa.airconmoa.util.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -36,7 +37,10 @@ public class User extends BaseTimeEntity {
     private String nickname;
 
     @Column(nullable = true)
-    private String userPhoto;
+    private String profileUrl;
+
+    @Column(nullable = true)
+    private String profileFileName;
 
     @Column(nullable = true)
     private String uid;
@@ -59,11 +63,11 @@ public class User extends BaseTimeEntity {
     private List<RequestEstimate> requestEstimates = new ArrayList<>();
   
     @Builder
-    private User(String authId, String authType, String email, String nickname, String userPhoto) {
+    private User(String authId, String authType, String email, String nickname, String profileUrl) {
         this.authType = authType;
         this.email = email;
         this.nickname = nickname;
-        this.userPhoto = userPhoto;
+        this.profileUrl = profileUrl;
         this.authId = authId;
         this.role = Role.USER;
         phoneNumber = null;
@@ -71,4 +75,9 @@ public class User extends BaseTimeEntity {
 
     public void updateUid(String uid) { this.uid = uid; }
     public void updateDeviceToken(String deviceToken) { this.deviceToken = deviceToken; }
+
+    public void setUserImg(GetS3Res getS3Res) {
+        this.profileUrl = getS3Res.getImgUrl();
+        this.profileFileName = getS3Res.getFileName();
+    }
 }

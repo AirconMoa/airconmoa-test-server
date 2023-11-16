@@ -31,6 +31,7 @@ public class UtilService {
 
     public RequestEstimate findByRequestEstimateIdWithValidation(Long requestEstimateId) throws BaseException {
         return requestEstimateRepository.findByRequestEstimateId(requestEstimateId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.NONE_EXIST_COMPANY));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.NONE_EXIST_REQUEST_ESTIMATE));
     }
+
 }
