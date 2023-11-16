@@ -175,7 +175,7 @@ public class CompanyService {
         }
 
         // 로그인 성공 => Jwt Token 발급
-        long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
+        long expireTimeMs = 6 * 1000 * 60 * 60;     // Token 유효 시간 = 6시간
         String jwtToken = JwtTokenUtil.createToken(company.getCompanyEmail(), secretKey, expireTimeMs);
         return jwtToken;
     }

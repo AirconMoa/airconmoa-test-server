@@ -73,7 +73,7 @@ public class AuthService {
                 // user = findNaver(accessToken);
                 // jwtToken = login(authType, accessToken);
             }
-            long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
+            long expireTimeMs = 6 * 1000 * 60 * 60;     // Token 유효 시간 = 6시간
             jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
             return new PostOauthLoginRes(user.getUserId(), user.getEmail(), jwtToken);
         }
@@ -92,7 +92,7 @@ public class AuthService {
             return "로그인 아이디 또는 비밀번호가 틀렸습니다.";
         }
         // 로그인 성공 => Jwt Token 발급
-        long expireTimeMs = 1000 * 60 * 60;     // Token 유효 시간 = 60분
+        long expireTimeMs = 6 * 1000 * 60 * 60;     // Token 유효 시간 = 6시간
         String jwtToken = JwtTokenUtil.createToken(user.getEmail(), secretKey, expireTimeMs);
         return jwtToken;
     }
