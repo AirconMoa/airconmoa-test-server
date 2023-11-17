@@ -1,5 +1,6 @@
 package com.airconmoa.airconmoa.user.controller;
 
+import com.airconmoa.airconmoa.config.jwt.JwtTokenFilter;
 import com.airconmoa.airconmoa.config.jwt.JwtTokenUtil;
 import com.airconmoa.airconmoa.domain.User;
 import com.airconmoa.airconmoa.response.BaseException;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     /** 카카오 소셜로그인 **/
     @PostMapping("/signup")
@@ -54,6 +56,13 @@ public class AuthController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+    // 액세스 토큰의 만료여부 확인
+    @GetMapping("check-token")
+    public BaseResponse<Boolean> isTokenExpired(Authentication auth) {
+        String accessToken = jwtTokenUtil.getJwt();
+        return new BaseResponse<>(authService.isTokenExpired(accessToken));
     }
 
 }

@@ -232,4 +232,8 @@ public class AuthService {
 
         return access_Token;
     }
+
+    public Boolean isTokenExpired(String accessToken) {
+        return JwtTokenUtil.isExpired(accessToken, secretKey);
+    }
 }
