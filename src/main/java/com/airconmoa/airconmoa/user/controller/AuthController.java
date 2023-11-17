@@ -60,7 +60,7 @@ public class AuthController {
 
     // 액세스 토큰의 만료여부 확인
     @GetMapping("check-token")
-    public BaseResponse<Boolean> isTokenExpired(Authentication auth) {
+    public BaseResponse<Boolean> isTokenExpired() {
         String accessToken = jwtTokenUtil.getJwt();
         return new BaseResponse<>(authService.isTokenExpired(accessToken));
     }
