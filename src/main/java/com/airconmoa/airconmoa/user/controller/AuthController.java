@@ -11,6 +11,7 @@ import com.airconmoa.airconmoa.user.dto.UserSignupReq;
 import com.airconmoa.airconmoa.user.dto.UserSignupRes;
 import com.airconmoa.airconmoa.user.service.AuthService;
 import com.airconmoa.airconmoa.user.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -61,8 +62,13 @@ public class AuthController {
     // 액세스 토큰의 만료여부 확인
     @GetMapping("check-token")
     public BaseResponse<Boolean> isTokenExpired() {
-        String accessToken = jwtTokenUtil.getJwt();
-        return new BaseResponse<>(authService.isTokenExpired(accessToken));
+        try {
+            String accessToken = jwtTokenUtil.getJwt();
+            return new BaseResponse<>(authService.isTokenExpired(accessToken));
+        }
+        catch (ExpiredJwtException e) {
+            return new BaseResponse<>(false);
+        }
     }
 
 }

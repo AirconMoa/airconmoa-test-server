@@ -1,6 +1,7 @@
 package com.airconmoa.airconmoa.config.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ public class JwtTokenUtil {
         return extractClaims(token, secretKey).get("email").toString();
     }
 
-    // 밝급된 Token이 만료 시간이 지났는지 체크
+    // 발급된 Token이 만료 시간이 지났는지 체크
     public static boolean isExpired(String token, String secretKey) {
         Date expiredDate = extractClaims(token, secretKey).getExpiration();
         // Token의 만료 날짜가 지금보다 이전인지 check
@@ -42,7 +43,11 @@ public class JwtTokenUtil {
 
     // SecretKey를 사용해 Token Parsing
     private static Claims extractClaims(String token, String secretKey) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 
     public String getJwt(){
