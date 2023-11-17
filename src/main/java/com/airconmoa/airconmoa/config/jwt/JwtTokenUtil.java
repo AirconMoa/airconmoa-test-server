@@ -47,7 +47,9 @@ public class JwtTokenUtil {
 
     public String getJwt(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader("Authorization");
+        String authorizationHeader = request.getHeader("Authorization");
+        String accessToken = authorizationHeader.split(" ")[1];
+        return accessToken;
     }
 
     public Long getExpiration(String accessToken, String key) {

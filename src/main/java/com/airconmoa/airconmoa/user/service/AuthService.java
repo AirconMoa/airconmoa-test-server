@@ -234,7 +234,6 @@ public class AuthService {
     }
 
     public Boolean isTokenExpired(String accessToken) {
-        String token = accessToken.split(" ")[1];
-        return JwtTokenUtil.isExpired(token, secretKey);
+        return JwtTokenUtil.isExpired(accessToken, secretKey);
     }
 }
