@@ -35,4 +35,14 @@ public class RequestEstimateController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    // 견적 요청 날짜를 반환하는 API
+    @GetMapping("/date")
+    public BaseResponse<String> getRequestEstimateDate(@RequestParam Long requestEstimateId) {
+        try {
+            return new BaseResponse<>(requestEstimateService.getRequestEstimateDate(requestEstimateId));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

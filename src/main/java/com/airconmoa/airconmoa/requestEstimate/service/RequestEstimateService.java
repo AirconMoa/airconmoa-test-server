@@ -10,6 +10,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Request;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +31,20 @@ public class RequestEstimateService {
     }
 
     public PostRequestEstimateReq getRequestEstimate(String companyEmail, Long requestEstimateId) {
-        utilService.findByCompanyEmailWithValidation(companyEmail);
+        // utilService.findByCompanyEmailWithValidation(companyEmail);
         RequestEstimate requestEstimate = utilService.findByRequestEstimateIdWithValidation(requestEstimateId);
         return new PostRequestEstimateReq(requestEstimate);
+    }
+
+    public String getRequestEstimateDate(Long requestEstimateId) {
+        RequestEstimate requestEstimate = utilService.findByRequestEstimateIdWithValidation(requestEstimateId);
+        LocalDateTime createDateTime = requestEstimate.getCreateDate();
+        LocalDate createDate = createDateTime.toLocalDate();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = createDate.format(formatter);
+
+        return formattedDate;
     }
 
 }
