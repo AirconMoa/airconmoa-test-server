@@ -102,7 +102,7 @@ Airconmoa 어플리케이션의 주요 기능은 에어컨 설치/수리/청소 
   <br>
 ## 📝 프로젝트 아키텍쳐
 <div align="center"><a href="https://github.com/AirconMoa/airconmoa-test-server/blob/main/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90.png">
-<img src="https://github.com/AirconMoa/airconmoa-test-server/blob/main/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90.png" height="500"></a>
+<img src="https://github.com/AirconMoa/airconmoa-test-server/blob/main/airconmoa-architecture.png" height="500"></a>
 </div>
 
 ## ✒️ 협업 규칙
