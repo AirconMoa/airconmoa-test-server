@@ -68,30 +68,6 @@ Airconmoa 어플리케이션의 주요 기능은 에어컨 설치/수리/청소 
             견적서, 서버<br>배포, 아키텍쳐
         </td>
     </tr>
-    <tr>
-        <th>GitHub</th>
-        <td width="100" align="center">
-            <a href="https://github.com/minjgziii">
-                <img src="http://img.shields.io/badge/gmlstjq123-green?style=social&logo=github"/>
-            </a>
-        </td>
-        <td width="100" align="center">
-            <a href="https://github.com/jaewonLeeKOR">
-                <img src="http://img.shields.io/badge/rossssa-green?style=social&logo=github"/>
-            </a>
-        </td>
-        <td width="100" align="center">
-            <a href="https://github.com/kick-sim">
-                <img src="http://img.shields.io/badge/songhaechan-green?style=social&logo=github"/>
-            </a>
-        </td>
-        <td width="100" align="center">
-            <a href="https://github.com/gmlstjq123">
-                <img src="http://img.shields.io/badge/duddn2012-green?style=social&logo=github"/>
-            </a>
-        </td>
-    </tr>
-  
 </table>
 <br>
 
